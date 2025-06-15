@@ -1,9 +1,5 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  experimental: {
-    swcPlugins: [["next-swc-darwin-x64", {}]],
-  },
-};
+const nextConfig: NextConfig = {};
 
 export default nextConfig;
