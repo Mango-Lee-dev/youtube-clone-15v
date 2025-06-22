@@ -1,11 +1,5 @@
 "use client";
-import {
-  UserButton,
-  SignIn,
-  SignUp,
-  SignedOut,
-  SignInButton,
-} from "@clerk/nextjs";
+import { UserButton, SignedOut, SignInButton, SignedIn } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { UserCircleIcon } from "lucide-react";
 
@@ -14,6 +8,10 @@ export const AuthButton = () => {
 
   return (
     <>
+      <SignedIn>
+        <UserButton />
+        {/* Add Menu for logged in users */}
+      </SignedIn>
       <SignedOut>
         <SignInButton mode="modal">
           <Button
