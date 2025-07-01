@@ -1,3 +1,6 @@
-export default function Home() {
-  return <div>I will load the home page here</div>;
+import { trpc } from "@/trpc/server";
+
+export default async function Home() {
+  const data = await trpc.hello({ text: "lee" });
+  return <div>{data.greeting}</div>;
 }
