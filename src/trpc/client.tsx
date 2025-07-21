@@ -9,6 +9,15 @@ import { makeQueryClient } from "./query-client";
 import type { AppRouter } from "./routers/_app";
 import superjson from "superjson";
 
+declare global {
+  interface Window {
+    Clerk: {
+      getToken: () => Promise<string | null>;
+      // add other Clerk methods if needed
+    };
+  }
+}
+
 export const trpc = createTRPCReact<AppRouter>();
 let clientQueryClientSingleton: QueryClient;
 function getQueryClient() {
@@ -46,6 +55,16 @@ export function TRPCProvider(
           async headers() {
             const headers = new Headers();
             headers.set("x-trpc-source", "nextjs-react");
+            if (typeof window !== "undefined") {
+              try {
+                const token = await window.Clerk.getToken();
+                if (token) {
+                  headers.set("authorization", `Bearer ${token}`);
+                }
+              } catch (error) {
+                console.error(error);
+              }
+            }
             return headers;
           },
         }),
