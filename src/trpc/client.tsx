@@ -55,16 +55,6 @@ export function TRPCProvider(
           async headers() {
             const headers = new Headers();
             headers.set("x-trpc-source", "nextjs-react");
-            if (typeof window !== "undefined") {
-              try {
-                const token = await window.Clerk.getToken();
-                if (token) {
-                  headers.set("authorization", `Bearer ${token}`);
-                }
-              } catch (error) {
-                console.error(error);
-              }
-            }
             return headers;
           },
         }),
