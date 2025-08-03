@@ -6,6 +6,8 @@ import { trpc } from "@/trpc/client";
 import { Loader2Icon, PlusIcon } from "lucide-react";
 import { toast } from "sonner";
 import { StudioUploader } from "./studio-uploader";
+import { TRPCClientErrorLike } from "@trpc/client";
+import { AppRouter } from "@/trpc/routers/_app";
 
 export const StudioUploadModal = () => {
   const utils = trpc.useUtils();
@@ -14,7 +16,7 @@ export const StudioUploadModal = () => {
       toast.success("비디오가 생성되었습니다.");
       utils.studio.getMany.invalidate();
     },
-    onError: (error: Error) => {
+    onError: (error: TRPCClientErrorLike<AppRouter>) => {
       toast.error(error.message);
     },
   });
