@@ -111,6 +111,29 @@ export const POST = async (req: Request) => {
       await db.delete(videos).where(eq(videos.muxUploadId, data.upload_id));
       break;
     }
+
+    case "video.asset.track.ready": {
+      const data = payload.data as VideoAssetTrackReadyWebhookEvent["data"] & {
+        asset_id: string;
+      };
+
+      //  TypeScript가 asset_id를 인식하지 못함
+      const assetId = data.asset_id;
+      const trackId = data.id;
+      const status = data.status;
+      if (!assetId) {
+        return new Response("No asset ID found", { status: 400 });
+      }
+
+      await db
+        .update(videos)
+        .set({
+          muxTrackId: trackId,
+          muxTrackStatus: status,
+        })
+        .where(eq(videos.muxAssetId, assetId));
+      break;
+    }
   }
 
   return new Response("Webhook received", { status: 200 });

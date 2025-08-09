@@ -17,6 +17,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { format } from "date-fns";
+import { Globe2Icon, Lock } from "lucide-react";
 
 export const VideosSection = () => {
   return (
@@ -82,7 +83,16 @@ export const VideosSectionSuspense = () => {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>Visibility</TableCell>
+                    <TableCell>
+                      <div className="flex items-center">
+                        {video.visibility === "private" ? (
+                          <Lock className="size-4 mr-2" />
+                        ) : (
+                          <Globe2Icon className="size-4 mr-2" />
+                        )}
+                        {snakeCaseToTitle(video.visibility)}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center">
                         {snakeCaseToTitle(video.muxStatus || "error")}
