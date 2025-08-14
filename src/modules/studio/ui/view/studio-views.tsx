@@ -1,6 +1,6 @@
 import { VideosSection } from "../sections/video-section";
 
-export const StudioView = () => {
+export const StudioViews = () => {
   return (
     <div className="flex flex-col gap-y-6 pt-2.5">
       <div className="px-4">
