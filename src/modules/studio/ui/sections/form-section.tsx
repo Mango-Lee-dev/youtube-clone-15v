@@ -43,6 +43,7 @@ import { toast } from "sonner";
 import { VideoPlayer } from "@/modules/videos/ui/components/video-player";
 import Link from "next/link";
 import { snakeCaseToTitle } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface FormSectionProps {
   videoId: string;
@@ -63,6 +64,7 @@ const FormSectionSkeleton = () => {
 };
 
 const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
+  const router = useRouter();
   const [video] = trpc.studio.getOne.useSuspenseQuery({ id: videoId });
   const [categories] = trpc.categories.getMany.useSuspenseQuery();
   const [isCopied, setIsCopied] = useState(false);
@@ -76,6 +78,17 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     },
     onError: (error) => {
       toast.error(error.message);
+    },
+  });
+
+  const remove = trpc.videos.delete.useMutation({
+    onSuccess: () => {
+      utils.studio.getMany.invalidate();
+      toast.success("Video deleted successfully");
+      router.push("/studio");
+    },
+    onError: () => {
+      toast.error("Failed to delete video");
     },
   });
   const form = useForm<z.infer<typeof videoFormSchema>>({
@@ -131,7 +144,9 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" side="left">
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => remove.mutate({ id: videoId })}
+                >
                   <TrashIcon className="w-4 h-4 mr-2" />
                   Delete
                 </DropdownMenuItem>
