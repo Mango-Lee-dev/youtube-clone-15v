@@ -86,6 +86,8 @@ export const videoFormSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   visibility: z.enum(["public", "private"]),
+  categoryId: z.string().optional(),
+  id: z.string().uuid(),
 });
 export const videoSelectSchema = createSelectSchema(videos);
 

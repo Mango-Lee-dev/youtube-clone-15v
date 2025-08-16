@@ -35,10 +35,7 @@ export const protectedProcedure = t.procedure.use(async function isAuthed(
 ) {
   const { ctx } = opts;
 
-  console.log("[TRPC PROTECTED] clerkUserId:", ctx.clerkUserId); // 로그 추가
-
   if (!ctx.clerkUserId) {
-    console.log("[TRPC PROTECTED] UNAUTHORIZED: No clerkUserId");
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 
@@ -48,19 +45,13 @@ export const protectedProcedure = t.procedure.use(async function isAuthed(
     .where(eq(users.clerkId, ctx.clerkUserId))
     .limit(1);
 
-  console.log("[TRPC PROTECTED] user from DB:", user); // 로그 추가
-
   if (!user) {
-    console.log("[TRPC PROTECTED] UNAUTHORIZED: No user in DB");
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 
   const { success } = await ratelimit.limit(user.id);
 
-  console.log("[TRPC PROTECTED] ratelimit success:", success); // 로그 추가
-
   if (!success) {
-    console.log("[TRPC PROTECTED] TOO_MANY_REQUESTS");
     throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
   }
 
