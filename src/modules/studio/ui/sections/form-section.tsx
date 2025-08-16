@@ -8,10 +8,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { trpc } from "@/trpc/client";
-import { MoreVertical, TrashIcon } from "lucide-react";
+import { CheckIcon, CopyIcon, MoreVertical, TrashIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { z } from "zod";
 import { videoFormSchema } from "@/db/schema";
@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { VideoPlayer } from "@/modules/videos/ui/components/video-player";
+import Link from "next/link";
 
 interface FormSectionProps {
   videoId: string;
@@ -56,6 +57,7 @@ const FormSectionSkeleton = () => {
 const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
   const [video] = trpc.studio.getOne.useSuspenseQuery({ id: videoId });
   const [categories] = trpc.categories.getMany.useSuspenseQuery();
+  const [isCopied, setIsCopied] = useState(false);
   const utils = trpc.useUtils();
 
   const update = trpc.videos.update.useMutation({
@@ -83,6 +85,19 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     update.mutate(data);
   };
 
+  //  TODO: Vercel 이외의 곳에 배포할 경우 변경!
+  const fullUrl = `${
+    process.env.VERCEL_URL || "http://localhost:3000"
+  }/studio/videos/${videoId}`;
+
+  const onCopy = async () => {
+    await navigator.clipboard.writeText(fullUrl);
+    setIsCopied(true);
+
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 2000);
+  };
   return (
     <Form {...form}>
       <form
@@ -200,6 +215,34 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                   playbackId={video.muxPlaybackId}
                   thumbnailUrl={video.thumbnailUrl}
                 />
+              </div>
+              <div className="p-4 flex flex-col gap-y-6">
+                <div className="flex justify-between items-center gap-x-2">
+                  <div className="flex flex-col gap-y-1">
+                    <p className="text-muted-foreground text-xs">Video Link</p>
+                    <div className="flex items-center gap-x-2">
+                      <Link href={`/vidoes/${video.id}`}>
+                        <p className="line-clamp-1 text-sm text-blue-500">
+                          {fullUrl}
+                        </p>
+                      </Link>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="shrink-0"
+                        disabled={false}
+                        onClick={onCopy}
+                      >
+                        {isCopied ? (
+                          <CheckIcon className="w-4 h-4" />
+                        ) : (
+                          <CopyIcon className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
