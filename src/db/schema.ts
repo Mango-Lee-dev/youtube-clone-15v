@@ -88,6 +88,7 @@ export const videoFormSchema = z.object({
   visibility: z.enum(["public", "private"]),
   categoryId: z.string().optional(),
   id: z.string().uuid(),
+  thumbnailUrl: z.string().optional(),
 });
 export const videoSelectSchema = createSelectSchema(videos);
 
