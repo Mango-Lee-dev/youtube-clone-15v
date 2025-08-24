@@ -39,26 +39,31 @@ export const protectedProcedure = t.procedure.use(async function isAuthed(
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 
-  const [user] = await db
-    .select()
-    .from(users)
-    .where(eq(users.clerkId, ctx.clerkUserId))
-    .limit(1);
+  try {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.clerkId, ctx.clerkUserId))
+      .limit(1);
 
-  if (!user) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
+    if (!user) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+
+    const { success } = await ratelimit.limit(user.id);
+
+    if (!success) {
+      throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
+    }
+
+    return opts.next({
+      ctx: {
+        ...ctx,
+        user,
+      },
+    });
+  } catch (error) {
+    console.error("Database error in protectedProcedure:", error);
+    throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
   }
-
-  const { success } = await ratelimit.limit(user.id);
-
-  if (!success) {
-    throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
-  }
-
-  return opts.next({
-    ctx: {
-      ...ctx,
-      user,
-    },
-  });
 });
