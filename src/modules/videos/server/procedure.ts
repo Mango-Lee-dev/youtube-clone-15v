@@ -9,19 +9,23 @@ import { UTApi } from "uploadthing/server";
 import { z } from "zod";
 
 export const videosRouter = createTRPCRouter({
-  generateThumbnail: protectedProcedure.mutation(async ({ ctx }) => {
-    const { id: userId } = ctx.user;
-    const { workflowRunId } = await workflow.trigger({
-      url: "https://beetle-direct-ram.ngrok-free.app/api/videos/workflows/title",
-      body: {
-        userId,
-      },
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    return workflowRunId;
-  }),
+  generateThumbnail: protectedProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const { id: userId } = ctx.user;
+      const { workflowRunId } = await workflow.trigger({
+        url: "https://beetle-direct-ram.ngrok-free.app/api/videos/workflows/title",
+        body: {
+          userId,
+          videoId: input.id,
+        },
+        retries: 3,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return workflowRunId;
+    }),
   restoreThumbnail: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
