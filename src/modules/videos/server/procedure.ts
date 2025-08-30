@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { videoFormSchema, videos } from "@/db/schema";
 import { mux } from "@/lib/mux";
+import { workflow } from "@/lib/workflow";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
@@ -8,6 +9,19 @@ import { UTApi } from "uploadthing/server";
 import { z } from "zod";
 
 export const videosRouter = createTRPCRouter({
+  generateThumbnail: protectedProcedure.mutation(async ({ ctx }) => {
+    const { id: userId } = ctx.user;
+    const { workflowRunId } = await workflow.trigger({
+      url: "https://beetle-direct-ram.ngrok-free.app/api/videos/workflows/title",
+      body: {
+        userId,
+      },
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return workflowRunId;
+  }),
   restoreThumbnail: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
