@@ -14,7 +14,7 @@ export const videosRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { id: userId } = ctx.user;
       const { workflowRunId } = await workflow.trigger({
-        url: "https://beetle-direct-ram.ngrok-free.app/api/videos/workflows/title",
+        url: `${process.env.UPSTASH_WORKFLOW_URL}/api/videos/workflows/title`,
         body: {
           userId,
           videoId: input.id,
