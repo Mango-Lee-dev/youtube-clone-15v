@@ -11,6 +11,7 @@ interface InputType {
 }
 
 export const { POST } = serve(async (context) => {
+  const utapi = new UTApi();
   const input = context.requestPayload as InputType;
   const { userId, videoId, prompt } = input;
 
@@ -53,7 +54,6 @@ export const { POST } = serve(async (context) => {
   const uploadedThumbnailUrl = await context.run(
     "upload-thumbnail",
     async () => {
-      const utapi = new UTApi();
       const { data, error } = await utapi.uploadFilesFromUrl(tempThumbnailUrl);
       if (error) {
         throw new Error("Failed to upload thumbnail");
@@ -61,6 +61,8 @@ export const { POST } = serve(async (context) => {
       return data;
     }
   );
+
+  await context.run("cleanup-thumbnail", async () => {});
 
   await context.run("update-video", async () => {
     await db
