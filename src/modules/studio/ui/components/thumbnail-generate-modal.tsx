@@ -40,6 +40,8 @@ export const ThumbnailGenerateModal = ({
   const generateThumbnail = trpc.videos.generateThumbnail.useMutation({
     onSuccess: () => {
       toast.success("Background job started");
+      form.reset();
+      onOpenChange(false);
     },
     onError: () => {
       toast.error("Failed to generate thumbnail");

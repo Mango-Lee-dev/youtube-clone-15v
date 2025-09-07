@@ -51,6 +51,19 @@ export const { POST } = serve(async (context) => {
     throw new Error("Bad request");
   }
 
+  await context.run("cleanup-thumbnail", async () => {
+    if (video.thumbnailKey) {
+      await utapi.deleteFiles(video.thumbnailKey);
+      await db
+        .update(videos)
+        .set({
+          thumbnailKey: null,
+          thumbnailUrl: null,
+        })
+        .where(and(eq(videos.id, videoId), eq(videos.userId, userId)));
+    }
+  });
+
   const uploadedThumbnailUrl = await context.run(
     "upload-thumbnail",
     async () => {
@@ -62,13 +75,12 @@ export const { POST } = serve(async (context) => {
     }
   );
 
-  await context.run("cleanup-thumbnail", async () => {});
-
   await context.run("update-video", async () => {
     await db
       .update(videos)
       .set({
-        title: tempThumbnailUrl || video.title,
+        thumbnailKey: uploadedThumbnailUrl?.key,
+        thumbnailUrl: uploadedThumbnailUrl?.url,
       })
       .where(and(eq(videos.id, video.id), eq(videos.userId, video.userId)));
   });
