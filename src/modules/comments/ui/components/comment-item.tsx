@@ -42,6 +42,33 @@ export const CommentItem = ({ comment }: CommentItemProps) => {
       }
     },
   });
+
+  const like = trpc.commentReactions.like.useMutation({
+    onSuccess: () => {
+      utils.comments.getMany.invalidate({ videoId: comment.videoId });
+      toast.success("Comment liked");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+
+      if (error.data?.code === "UNAUTHORIZED") {
+        clerk.openSignIn();
+      }
+    },
+  });
+  const dislike = trpc.commentReactions.dislike.useMutation({
+    onSuccess: () => {
+      utils.comments.getMany.invalidate({ videoId: comment.videoId });
+      toast.success("Comment disliked");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+
+      if (error.data?.code === "UNAUTHORIZED") {
+        clerk.openSignIn();
+      }
+    },
+  });
   return (
     <div>
       <div className="flex gap-4">
@@ -71,6 +98,7 @@ export const CommentItem = ({ comment }: CommentItemProps) => {
                 size="icon"
                 className="size-8"
                 disabled={false}
+                onClick={() => like.mutate({ commentId: comment.id })}
               >
                 <ThumbsUpIcon
                   className={cn(
@@ -88,6 +116,7 @@ export const CommentItem = ({ comment }: CommentItemProps) => {
                 size="icon"
                 className="size-8"
                 disabled={false}
+                onClick={() => dislike.mutate({ commentId: comment.id })}
               >
                 <ThumbsDownIcon
                   className={cn(
