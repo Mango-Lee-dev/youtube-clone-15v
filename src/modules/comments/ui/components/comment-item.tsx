@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 
 interface CommentItemProps {
   comment: CommentsGetManyOutput["items"][number];
+  variant?: "reply" | "comment";
 }
 
 export const CommentItem = ({ comment }: CommentItemProps) => {
