@@ -1,8 +1,8 @@
 import { db } from "@/db";
-import { videos } from "@/db/schema";
+import { users, videoReactions, videos, videoViews } from "@/db/schema";
 import { baseProcedure, createTRPCRouter } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
-import { eq, and, or, lt, desc } from "drizzle-orm";
+import { eq, and, or, lt, desc, getTableColumns } from "drizzle-orm";
 import { z } from "zod";
 
 export const suggestionsRouter = createTRPCRouter({
@@ -30,8 +30,27 @@ export const suggestionsRouter = createTRPCRouter({
       }
 
       const data = await db
-        .select()
+        .select({
+          ...getTableColumns(videos),
+          user: users,
+          viewCount: db.$count(videoViews, eq(videoViews.videoId, videos.id)),
+          likeCount: db.$count(
+            videoReactions,
+            and(
+              eq(videoReactions.videoId, videos.id),
+              eq(videoReactions.type, "like")
+            )
+          ),
+          dislikeCount: db.$count(
+            videoReactions,
+            and(
+              eq(videoReactions.videoId, videos.id),
+              eq(videoReactions.type, "dislike")
+            )
+          ),
+        })
         .from(videos)
+        .innerJoin(users, eq(videos.userId, users.id))
         .where(
           and(
             existingVideo.categoryId
@@ -51,10 +70,7 @@ export const suggestionsRouter = createTRPCRouter({
         .orderBy(desc(videos.updatedAt), desc(videos.id))
         .limit(limit + 1);
       const hasMore = data.length > limit;
-      //  Remove the last item if there are more items
       const items = hasMore ? data.slice(0, -1) : data;
-
-      //  Set the next cursor to the last item if there are more items
       const lastItem = items[items.length - 1];
       const nextCursor = hasMore
         ? {
