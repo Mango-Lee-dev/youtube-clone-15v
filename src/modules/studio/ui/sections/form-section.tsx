@@ -19,7 +19,6 @@ import {
   MoreVerticalIcon,
   RotateCcw,
   SparklesIcon,
-  TrashIcon,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -158,6 +157,19 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
       toast.error("Failed to delete video");
     },
   });
+
+  const revalidate = trpc.videos.revalidate.useMutation({
+    onSuccess: () => {
+      utils.studio.getMany.invalidate();
+      utils.studio.getOne.invalidate({ id: videoId });
+      toast.success("Video revalidated successfully");
+      router.push("/studio")
+    },
+    onError: () => {
+      toast.error("Failed to revalidate video");
+    }
+  })
+
   const form = useForm<z.infer<typeof videoFormSchema>>({
     resolver: zodResolver(videoFormSchema),
     defaultValues: {
@@ -256,10 +268,10 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" side="left">
                   <DropdownMenuItem
-                    onClick={() => remove.mutate({ id: videoId })}
+                    onClick={() => revalidate.mutate({ id: videoId })}
                   >
-                    <TrashIcon className="w-4 h-4 mr-2" />
-                    Delete
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    Revalidate
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
