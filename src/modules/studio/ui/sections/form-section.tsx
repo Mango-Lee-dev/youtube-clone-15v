@@ -49,7 +49,7 @@ import Link from "next/link";
 import { snakeCaseToTitle } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { THUMBNAIL_FALLBACK } from "@/modules/videos/constants";
+import { APP_URL, THUMBNAIL_FALLBACK } from "@/modules/videos/constants";
 import { ThumbnailUploadModal } from "../components/thumbnail-upload-modal";
 import { ThumbnailGenerateModal } from "../components/thumbnail-generate-modal";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -163,12 +163,12 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
       utils.studio.getMany.invalidate();
       utils.studio.getOne.invalidate({ id: videoId });
       toast.success("Video revalidated successfully");
-      router.push("/studio")
+      router.push("/studio");
     },
     onError: () => {
       toast.error("Failed to revalidate video");
-    }
-  })
+    },
+  });
 
   const form = useForm<z.infer<typeof videoFormSchema>>({
     resolver: zodResolver(videoFormSchema),
@@ -187,7 +187,7 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
 
   //  TODO: Vercel 이외의 곳에 배포할 경우 변경!
   const fullUrl = `${
-    process.env.VERCEL_URL || "http://localhost:3000"
+    APP_URL || "http://localhost:3000"
   }/studio/videos/${videoId}`;
 
   const onCopy = async () => {
