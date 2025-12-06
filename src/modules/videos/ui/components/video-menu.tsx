@@ -12,6 +12,7 @@ import {
   Trash2Icon,
 } from "lucide-react";
 import { toast } from "sonner";
+import { APP_URL } from "../../constants";
 
 interface VideoMenuProps {
   videoId: string;
@@ -21,9 +22,7 @@ interface VideoMenuProps {
 
 export const VideoMenu = ({ videoId, variant, onRemove }: VideoMenuProps) => {
   const onShare = () => {
-    const fullUrl = `${
-      process.env.VERCEL_URL || "http://localhost:3000"
-    }/studio/videos/${videoId}`;
+    const fullUrl = `${APP_URL}/studio/videos/${videoId}`;
     navigator.clipboard.writeText(fullUrl);
     toast.success("Link copied to clipboard");
   };

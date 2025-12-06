@@ -2,13 +2,14 @@
 import { Button } from "@/components/ui/button";
 import { APP_URL } from "@/modules/videos/constants";
 import { SearchIcon, XIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 export const SearchInput = () => {
   //  TODO: add search functionality
-  const [value, setValue] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [value, setValue] = useState(searchParams.get("query") || "");
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const url = new URL("/search", APP_URL);
