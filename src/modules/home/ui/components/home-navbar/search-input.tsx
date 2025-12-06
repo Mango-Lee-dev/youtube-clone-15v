@@ -9,13 +9,21 @@ export const SearchInput = () => {
   //  TODO: add search functionality
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [value, setValue] = useState(searchParams.get("query") || "");
+
+  const query = searchParams.get("query") || "";
+  const categoryId = searchParams.get("categoryId") || "";
+
+  const [value, setValue] = useState(query);
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const url = new URL("/search", APP_URL);
     const newQuery = value.trim();
 
     url.searchParams.set("query", encodeURIComponent(newQuery));
+
+    if (categoryId) {
+      url.searchParams.set("categoryId", categoryId);
+    }
 
     if (newQuery === "") {
       url.searchParams.delete("query");

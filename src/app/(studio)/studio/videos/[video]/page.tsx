@@ -7,6 +7,8 @@ interface VideoPageProps {
   params: Promise<{ video: string }>;
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function VideoPage({ params }: VideoPageProps) {
   const { video } = await params;
   await trpc.studio.getOne.prefetch({ id: video });

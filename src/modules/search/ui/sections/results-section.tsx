@@ -7,10 +7,6 @@ import {
   VideoRowCard,
   VideoRowCardSkeleton,
 } from "@/modules/videos/ui/components/video-row-card";
-import {
-  VideoGridCard,
-  VideoGridCardSkeleton,
-} from "@/modules/videos/ui/components/video-grid-card";
 import { InfiniteScroll } from "@/components/infinite-scroll";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
@@ -22,7 +18,10 @@ interface ResultsSectionProps {
 
 export const ResultsSection = (props: ResultsSectionProps) => {
   return (
-    <Suspense fallback={<p>Loading...</p>}>
+    <Suspense
+      key={`${props.query}-${props.categoryId}`}
+      fallback={<ResultsSectionSkeleton />}
+    >
       <ErrorBoundary fallback={<p>Something went wrong</p>}>
         <ResultsSectionSuspense {...props} />
       </ErrorBoundary>
