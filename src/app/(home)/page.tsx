@@ -1,8 +1,8 @@
-export const dynamic = "force-dynamic";
-
 import { DEFAULT_LIMIT } from "@/constants";
 import { HomeView } from "@/modules/home/ui/views/home-view";
 import { HydrateClient, trpc } from "@/trpc/server";
+
+export const dynamic = "force-dynamic";
 
 interface PageProps {
   searchParams: Promise<{
