@@ -6,6 +6,7 @@ import { VideoRowCard } from "@/modules/videos/ui/components/video-row-card";
 import { trpc } from "@/trpc/client";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
+import { toast } from "sonner";
 
 interface VideosSectionProps {
   playlistId: string;
@@ -41,20 +42,31 @@ const VideosSectionSuspense = ({ playlistId }: VideosSectionProps) => {
       getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
     }
   );
+
+  const utils = trpc.useUtils();
+  const removeVideo = trpc.playlists.removeVideo.useMutation({
+    onSuccess: (data) => {
+      toast.success("Video removed from playlist");
+      utils.playlists.getMany.invalidate();
+      utils.playlists.getManyForVideo.invalidate({ videoId: data.videoId });
+      utils.playlists.getOne.invalidate({ id: data.playlistId });
+      utils.playlists.getVideos.invalidate({ playlistId: data.playlistId });
+    },
+  });
   return (
     <div>
       <div className="flex flex-col gap-4 gap-y-10 md:hidden">
         {videos.pages
           .flatMap((page) => page.items)
           .map((video) => (
-            <VideoGridCard key={video.id} data={video} />
+            <VideoGridCard key={video.id} data={video} onRemove={() => removeVideo.mutate({ playlistId, videoId: video.id })} />
           ))}
       </div>
       <div className="hidden md:flex flex-col gap-4  ">
         {videos.pages
           .flatMap((page) => page.items)
           .map((video) => (
-            <VideoRowCard key={video.id} data={video} size="compact" />
+            <VideoRowCard key={video.id} data={video} size="compact" onRemove={() => removeVideo.mutate({ playlistId, videoId: video.id })} />
           ))}
       </div>
       <InfiniteScroll
