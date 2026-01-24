@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic";
-
 import { VideoView } from "@/modules/studio/ui/view/video-view";
 import { HydrateClient, trpc } from "@/trpc/server";
 

@@ -19,6 +19,7 @@ import {
   MoreVerticalIcon,
   RotateCcw,
   SparklesIcon,
+  Trash2Icon,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -147,7 +148,7 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     },
   });
 
-  const remove = trpc.videos.delete.useMutation({
+  const remove = trpc.videos.remove.useMutation({
     onSuccess: () => {
       utils.studio.getMany.invalidate();
       toast.success("Video deleted successfully");
@@ -272,6 +273,12 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                   >
                     <RotateCcw className="w-4 h-4 mr-2" />
                     Revalidate
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => remove.mutate({ id: videoId })}
+                  >
+                    <Trash2Icon className="w-4 h-4 mr-2" />
+                    Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
