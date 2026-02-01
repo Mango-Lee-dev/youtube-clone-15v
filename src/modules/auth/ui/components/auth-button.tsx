@@ -1,7 +1,7 @@
 "use client";
 import { UserButton, SignedOut, SignInButton, SignedIn } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { ClapperboardIcon, UserCircleIcon } from "lucide-react";
+import { ClapperboardIcon, UserCircleIcon, UserIcon } from "lucide-react";
 
 export const AuthButton = () => {
   //  TODO: add different button for logged in and logged out users
@@ -11,6 +11,11 @@ export const AuthButton = () => {
       <SignedIn>
         <UserButton>
           <UserButton.MenuItems>
+            <UserButton.Link
+              label="My Profile"
+              href="/users/current"
+              labelIcon={<UserIcon className="size-4" />}
+            />
             <UserButton.Link
               label="Studio"
               href="/studio"
