@@ -17,12 +17,12 @@ export const UserPageInfo = ({ user }: UserPageInfoProps) => {
   const { isPending, onClick } = useSubscription({
     userId: user.id,
     isSubscribed: user.viewerSubscribed,
-  })
+  });
   return (
     <div className="py-6">
       <div className="flex flex-col md:hidden">
         <div className="flex items-center gap-3">
-          <UserAvatar 
+          <UserAvatar
             imageUrl={user.imageUrl}
             name={user.name}
             size="lg"
@@ -34,17 +34,11 @@ export const UserPageInfo = ({ user }: UserPageInfoProps) => {
             }}
           />
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold">
-              {user.name}
-            </h1>
+            <h1 className="text-xl font-bold">{user.name}</h1>
             <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-              <span>
-                {user.subscriberCount} subscribers
-              </span>
+              <span>{user.subscriberCount} subscribers</span>
               <span>•</span>
-              <span>
-                {user.videoCount} videos
-              </span>
+              <span>{user.videoCount} videos</span>
             </div>
           </div>
         </div>
@@ -54,11 +48,9 @@ export const UserPageInfo = ({ user }: UserPageInfoProps) => {
             asChild
             className="w-full mt-3 rounded-full"
           >
-            <Link href="/studio">
-              Go to studio
-            </Link>
+            <Link href="/studio">Go to studio</Link>
           </Button>
-        ): (
+        ) : (
           <SubscriptionButton
             disabled={isPending || !isLoaded}
             isSubscribed={user.viewerSubscribed}
@@ -70,11 +62,14 @@ export const UserPageInfo = ({ user }: UserPageInfoProps) => {
 
       {/* Desktop */}
       <div className="hidden md:flex flex-col">
-        <UserAvatar 
+        <UserAvatar
           imageUrl={user.imageUrl}
           name={user.name}
           size="xl"
-          className={cn(userId === user.clerkId && "cursor-pointer hover:opacity-80 transition-opacity duration-300")}
+          className={cn(
+            userId === user.clerkId &&
+              "cursor-pointer hover:opacity-80 transition-opacity duration-300",
+          )}
           onClick={() => {
             if (userId === user.clerkId) {
               clerk.openUserProfile();
@@ -85,13 +80,9 @@ export const UserPageInfo = ({ user }: UserPageInfoProps) => {
           <h1 className="text-2xl font-bold">{user.name}</h1>
         </div>
         <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-          <span>
-            {user.subscriberCount} subscribers
-          </span>
+          <span>{user.subscriberCount} subscribers</span>
           <span>•</span>
-          <span>
-            {user.videoCount} videos
-          </span>
+          <span>{user.videoCount} videos</span>
         </div>
         {userId === user.clerkId ? (
           <Button
@@ -99,11 +90,9 @@ export const UserPageInfo = ({ user }: UserPageInfoProps) => {
             asChild
             className="w-full mt-3 rounded-full"
           >
-            <Link href="/studio">
-              Go to studio
-            </Link>
+            <Link href="/studio">Go to studio</Link>
           </Button>
-        ): (
+        ) : (
           <SubscriptionButton
             disabled={isPending || !isLoaded}
             isSubscribed={user.viewerSubscribed}
@@ -113,7 +102,5 @@ export const UserPageInfo = ({ user }: UserPageInfoProps) => {
         )}
       </div>
     </div>
-  )
-}
-
-
+  );
+};

@@ -9,6 +9,50 @@ import { z } from "zod";
 const f = createUploadthing();
 
 export const ourFileRouter = {
+  bannerUploader: f({
+    image: {
+      maxFileSize: "4MB",
+      maxFileCount: 1,
+    },
+  })
+    .middleware(async () => {
+      const { userId: clerkUserId } = await auth();
+
+      if (!clerkUserId) throw new UploadThingError("Unauthorized");
+
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.clerkId, clerkUserId));
+
+      if (!user) throw new UploadThingError("Unauthorized");
+
+      if (user.bannerKey) {
+        const utapi = new UTApi();
+
+        await utapi.deleteFiles(user.bannerKey);
+
+        await db
+          .update(users)
+          .set({
+            bannerKey: null,
+            bannerUrl: null,
+          })
+          .where(and(eq(users.id, user.id)));
+      }
+      return { userId: user.id };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      await db
+        .update(users)
+        .set({
+          bannerUrl: file.url,
+          bannerKey: file.key,
+        })
+        .where(eq(users.id, metadata.userId));
+
+      return { uploadedBy: metadata.userId };
+    }),
   thumbnailUploader: f({
     image: {
       maxFileSize: "4MB",
@@ -62,8 +106,8 @@ export const ourFileRouter = {
         .where(
           and(
             eq(videos.id, metadata.videoId),
-            eq(videos.userId, metadata.user.id)
-          )
+            eq(videos.userId, metadata.user.id),
+          ),
         );
 
       return { uploadedBy: metadata.user.id };
