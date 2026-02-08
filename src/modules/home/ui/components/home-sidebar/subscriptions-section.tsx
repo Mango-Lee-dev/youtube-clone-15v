@@ -13,6 +13,22 @@ import { DEFAULT_LIMIT } from "@/constants";
 import { trpc } from "@/trpc/client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
+
+export const SubscriptionsSectionSkeleton = () => {
+  return (
+    <>
+      {Array.from({ length: 5 }).map((_, index) => (
+        <SidebarMenuItem key={index}>
+          <SidebarMenuButton disabled>
+            <Skeleton className="size-6 rounded-full bg-primary/10" />
+            <Skeleton className="h-4 w-20 bg-primary/10" />
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ))}
+    </>
+  );
+};
 
 export const SubscriptionsSection = () => {
   const pathname = usePathname();
